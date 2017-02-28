@@ -1,19 +1,38 @@
-from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
 import os
+from flask import Flask, render_template
+from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.orm import joinedload
+
 
 app = Flask(__name__)
 app.config.from_object(os.environ['APP_SETTINGS'])
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
-from models import Team
+from admin import admin
+from models import Team, Team_Stats
 
 
 @app.route('/')
-def hello():
-    return "Hello, World!"
+def index():
+    #teams = db.session.query(Team).options(joinedload('team_stats')).order_by(Team.name)
+    teams = db.session.query(Team).order_by(Team.name)
+    return render_template('index.html', teams=teams)
 
+@app.route('/add/<name>')
+def add_team(name):
+    team = Team(
+        name=name
+    )
+    team_stats = Team_Stats(
+        team_id = team.id,
+    )
+    team.team_stats = team_stats
 
+    db.session.add(team)
+    db.session.commit()
+    teams = db.session.query(Team).order_by(Team.name)
+    return render_template('index.html', teams=teams)
+    
 if __name__ == '__main__':
     app.run()

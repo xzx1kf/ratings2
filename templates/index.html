@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Football Ratings</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet"
+          href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+          integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+          crossorigin="anonymous">
+  </head>
+  <body>
+    <div class="container">
+      <h1>Football Ratings</h1>
+      {% for team in teams %}
+      <h4>{{ team.name }}</h4>
+      <h5>{{ team.team_stats.home_goals }}</h5>
+      {% endfor %}
+    </div>
+  </body>
+</html>
