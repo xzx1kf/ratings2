@@ -1,0 +1,13 @@
+[ ] split the routes out from the main app file as per
+    charlesleifer.com
+
+[ ] Create the other models... league, league_stats, match, match_stats
+    match_odds, match_probabilities
+
+[ ] Incorporate angular, I would think retrieving the odds and whatnot
+    could be used. Especially executing a task via redis.
+
+[ ] Hell the whole page could be build using angular
+
+[ ] what the hell is the difference between angular, react, nodejs,
+    etc...

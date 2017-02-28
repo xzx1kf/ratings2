@@ -15,7 +15,6 @@ from models import Team, Team_Stats
 
 @app.route('/')
 def index():
-    #teams = db.session.query(Team).options(joinedload('team_stats')).order_by(Team.name)
     teams = db.session.query(Team).order_by(Team.name)
     return render_template('index.html', teams=teams)
 
@@ -33,6 +32,10 @@ def add_team(name):
     db.session.commit()
     teams = db.session.query(Team).order_by(Team.name)
     return render_template('index.html', teams=teams)
+
+@app.route('/angular')
+def angular():
+    return render_template('angular.html')
     
 if __name__ == '__main__':
     app.run()
