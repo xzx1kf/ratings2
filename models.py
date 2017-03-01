@@ -1,14 +1,37 @@
+from datetime import datetime
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import relationship
 
 from app import db
 
 
+class League(db.Model):
+    __tablename__ = 'league'
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String())
+    display_name = db.Column(db.String())
+    active = db.Column(db.Boolean())
+    start_date = db.Column(db.DateTime())
+    teams = relationship("Team")
+
+    def __init__(self, name="", display_name="", active=True,
+                 start_date=datetime.today()):
+        self.name = name
+        self.display_name = display_name
+        self.active = active
+        self.start_date = start_date
+
+    def __repr__(self):
+        return '<id: {}> {}'.format(self.id, self.name)
+
+    
 class Team(db.Model):
     __tablename__ = 'teams'
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String())
+    league_id = db.Column(db.Integer, ForeignKey('league.id'))
 
     team_stats = relationship(
         "Team_Stats",
