@@ -31,6 +31,14 @@ class Team(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String())
+    played = db.Column(db.Integer, default=0)
+    won = db.Column(db.Integer, default=0)
+    drawn = db.Column(db.Integer, default=0)
+    lost = db.Column(db.Integer, default=0)
+    goals_for = db.Column(db.Integer, default=0)
+    goals_against = db.Column(db.Integer, default=0)
+    goal_difference = db.Column(db.Integer, default=0)
+    points = db.Column(db.Integer, default=0)
     league_id = db.Column(db.Integer, ForeignKey('league.id'))
 
     team_stats = relationship(

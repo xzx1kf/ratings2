@@ -1,19 +1,35 @@
 <!doctype html>
-<html lang="en" ng-app="phonecatApp">
+<html lang="en" ng-app="footballRatings">
   <head>
     <meta charset="utf-8">
-    <title>My HTML File</title>
+    <title>Football Ratings - Tables</title>
     <link rel="stylesheet"
           href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
           integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
           crossorigin="anonymous">
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.2/angular.min.js"></script>
     <script src="{{ url_for('static', filename='app.js') }}"></script>
-    <script src="{{ url_for('static', filename='phone-list.component.js') }}"></script>
+    <script src="{{ url_for('static', filename='team-list.component.js') }}"></script>
   </head>
   <body>
+    <table>
 
-    <phone-list></phone-list>
+	<tr>
+	  <th>Position</th>
+	  <th>Team</th>
+	  <th>P</th>
+	  <th>W</th>
+	  <th>D</th>
+	  <th>L</th>
+	  <th>F</th>
+	  <th>A</th>
+	  <th>GD</th>
+	  <th>Pts</th>
+	</tr>
 
+
+	<team-list></team-list>
+
+    </table>
   </body>
 </html>

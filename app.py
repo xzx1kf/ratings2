@@ -33,6 +33,11 @@ def add_team(name):
     teams = db.session.query(Team).order_by(Team.name)
     return render_template('index.html', teams=teams)
 
+@app.route('/tables')
+def tables():
+    teams = db.session.query(Team).order_by(Team.points, Team.goal_difference)
+    return render_template('tables.html', teams=teams)
+
 @app.route('/angular')
 def angular():
     return render_template('angular.html')
