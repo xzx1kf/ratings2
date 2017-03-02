@@ -5,6 +5,25 @@ from sqlalchemy.orm import relationship
 from app import db
 
 
+class Fixture(db.Model):
+    __tablename__ = 'fixture'
+
+    id = db.Column(db.Integer, primary_key=True)
+    date = db.Column(db.DateTime())
+    home_team_id = db.Column(db.Integer, ForeignKey('teams.id'))
+    home_team = relationship("Team", foreign_keys=[home_team_id])
+    away_team_id = db.Column(db.Integer, ForeignKey('teams.id'))
+    away_team = relationship("Team", foreign_keys=[away_team_id])
+    completed = db.Column(db.Boolean, default=False)
+
+    def __repr__(self):
+        return '<id: {}> {} vs {}'.format(
+            self.id,
+            self.home_team_id,
+            self.away_team_id,
+        )
+
+
 class League(db.Model):
     __tablename__ = 'league'
 

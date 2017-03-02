@@ -1,35 +1,35 @@
-<!doctype html>
-<html lang="en" ng-app="footballRatings">
-  <head>
-    <meta charset="utf-8">
-    <title>Football Ratings - Tables</title>
-    <link rel="stylesheet"
-          href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
-          integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
-          crossorigin="anonymous">
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.2/angular.min.js"></script>
-    <script src="{{ url_for('static', filename='app.js') }}"></script>
-    <script src="{{ url_for('static', filename='team-list.component.js') }}"></script>
-  </head>
-  <body>
-    <table>
-
-	<tr>
-	  <th>Position</th>
-	  <th>Team</th>
-	  <th>P</th>
-	  <th>W</th>
-	  <th>D</th>
-	  <th>L</th>
-	  <th>F</th>
-	  <th>A</th>
-	  <th>GD</th>
-	  <th>Pts</th>
-	</tr>
-
-
-	<team-list></team-list>
-
-    </table>
-  </body>
-</html>
+{% extends "base.html" %}
+{% block content %}
+<table class="table">
+  <thead>
+    <tr>
+      <th>Position</th>
+      <th>Team</th>
+      <th>P</th>
+      <th>W</th>
+      <th>D</th>
+      <th>L</th>
+      <th>F</th>
+      <th>A</th>
+      <th>GD</th>
+      <th>Pts</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for team in teams %}
+    <tr>
+      <td>{{ loop.index }}</td>
+      <td>{{ team.name }}</td>
+      <td>{{ team.played }}</td>
+      <td>{{ team.won }}</td>
+      <td>{{ team.drawn }}</td>
+      <td>{{ team.lost }}</td>
+      <td>{{ team.goals_for }}</td>
+      <td>{{ team.goals_against }}</td>
+      <td>{{ team.goal_difference }}</td>
+      <td>{{ team.points }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

@@ -10,7 +10,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
 from admin import admin
-from models import Team, Team_Stats
+from models import Fixture, Team, Team_Stats
 
 
 @app.route('/')
@@ -18,24 +18,15 @@ def index():
     teams = db.session.query(Team).order_by(Team.name)
     return render_template('index.html', teams=teams)
 
-@app.route('/add/<name>')
-def add_team(name):
-    team = Team(
-        name=name
-    )
-    team_stats = Team_Stats(
-        team_id = team.id,
-    )
-    team.team_stats = team_stats
-
-    db.session.add(team)
-    db.session.commit()
-    teams = db.session.query(Team).order_by(Team.name)
-    return render_template('index.html', teams=teams)
-
+@app.route('/fixtures')
+def fixtures():
+    fixtures = db.session.query(Fixture).order_by(Fixture.date)
+    return render_template('fixtures.html', fixtures=fixtures)
+    
 @app.route('/tables')
 def tables():
-    teams = db.session.query(Team).order_by(Team.points, Team.goal_difference)
+    teams = db.session.query(Team).order_by(Team.points.desc(),
+                                            Team.goal_difference.desc())
     return render_template('tables.html', teams=teams)
 
 @app.route('/angular')

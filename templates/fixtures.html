@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block content %}
+  <table class="table">
+    <thead>
+      <th>Date</th>
+      <th>Home Team</th>
+      <th>Away Team</th>
+    </thead>
+    <tbody>
+      {% for fixture in fixtures %}
+      <tr>
+	<td>{{ fixture.date }}</td>
+	<td>{{ fixture.home_team.name }}</td>
+	<td>{{ fixture.away_team.name }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}
