@@ -9,18 +9,21 @@ class Fixture(db.Model):
     __tablename__ = 'fixture'
 
     id = db.Column(db.Integer, primary_key=True)
+    league_id = db.Column(db.Integer, ForeignKey('league.id'))
+    league = relationship("League")
     date = db.Column(db.DateTime())
     home_team_id = db.Column(db.Integer, ForeignKey('teams.id'))
     home_team = relationship("Team", foreign_keys=[home_team_id])
     away_team_id = db.Column(db.Integer, ForeignKey('teams.id'))
     away_team = relationship("Team", foreign_keys=[away_team_id])
     completed = db.Column(db.Boolean, default=False)
-
+        
     def __repr__(self):
         return '<id: {}> {} vs {}'.format(
             self.id,
             self.home_team_id,
             self.away_team_id,
+            self.league_id,
         )
 
 
@@ -34,7 +37,7 @@ class League(db.Model):
     start_date = db.Column(db.DateTime())
     teams = relationship("Team")
 
-    def __init__(self, name="", display_name="", active=True,
+    def __init__(self, name="", display_name="", active=False,
                  start_date=datetime.today()):
         self.name = name
         self.display_name = display_name
@@ -66,7 +69,7 @@ class Team(db.Model):
         back_populates="team"
     )
 
-    def __init__(self, name=""):
+    def __init__(self, name="", league_id=None):
         self.name = name
 
     def __repr__(self):

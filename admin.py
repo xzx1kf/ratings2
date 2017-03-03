@@ -12,6 +12,17 @@ class TeamView(ModelView):
 
 class FixtureView(ModelView):
     """
+    form_ajax_refs = {
+        'home_team' : {
+            'fields': (Team.name,)
+            },
+        'away_team' : {
+            'fields': (Team.name,)
+            }
+        }
+
+    """
+    """
     The on_model_change allows me to insert some logic. So in the case
     of the fixture save I can calculate fixture stats etc
     """
