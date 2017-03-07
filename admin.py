@@ -9,6 +9,7 @@ from flask import request
 from sqlalchemy import or_
 from flask import Response
 from flask import json
+from flask_admin.form import rules
 
 admin = Admin(app, name='Football Ratings', template_mode='bootstrap3')
 
@@ -43,9 +44,13 @@ class TeamView(ModelView):
 
 class FixtureView(ModelView):
     column_filter_by = ('home_team')
+    column_filter_by = ('away_team')
 
     form_widget_args = {
         'home_team': {
+            'data-filter-by': 'league',
+            },
+        'away_team': {
             'data-filter-by': 'league',
             },
         }
@@ -58,7 +63,22 @@ class FixtureView(ModelView):
             placeholder='Select home team...',
             filter_by=(League, 'league_id'),
             ),
+        'away_team': FilteredAjaxModelLoader(
+            'away_team', db.session, Team,
+            fields=('name',),
+            page_size=10,
+            placeholder='Select away team...',
+            filter_by=(League, 'league_id'),
+            )
         }
+
+
+    form_columns = ('date',
+                    'league',
+                    'home_team',
+                    'away_team',
+                    'completed')
+    
 
 
     @expose('/ajax/lookup/')
