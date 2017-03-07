@@ -50,6 +50,31 @@ class OptionsView(BaseView):
         team.goal_difference = 0
         team.points = 0
         return team
+
+    def calculate_league_stats(self):
+        leagues = db.session.query(League).filter_by(
+            id = 6)
+
+        for league in leagues:
+            fixtures = db.session.query(Fixture).filter_by(
+                league_id = league.id,
+                completed = True)
+
+            home_goals = 0
+            away_goals = 0
+
+            number_of_fixtures = fixtures.count()
+
+            for fixture in fixtures:
+                home_goals += fixture.home_goals
+                away_goals += fixture.away_goals
+
+            print("{}/{}".format(home_goals, number_of_fixtures))
+            print("{}/{}".format(away_goals, number_of_fixtures))
+        pass
+
+    def calculate_team_stats(self):
+        pass
         
     def update_league_tables(self):
         try:
@@ -103,9 +128,9 @@ class OptionsView(BaseView):
     def index(self):
         if request.method == "POST":
             if "update_league" in request.form:
-                print("Put logic to handle update league table here.")
                 self.update_league_tables()
-                
+            elif "calculate_league_stats" in request.form:
+                self.calculate_league_stats()
         return self.render('admin/options.html')
 
 class TeamView(ModelView):

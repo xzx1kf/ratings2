@@ -21,7 +21,8 @@ def fixture(fixture_id):
 @app.route('/<league_name>/table')
 def table(league_name):
     league = db.session.query(League).filter_by(
-        display_name = league_name).one()
+        slug = league_name).one()
+    
     teams = db.session.query(Team).filter_by(
         league_id = league.id).order_by(
             Team.points.desc(),

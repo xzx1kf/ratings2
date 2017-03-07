@@ -1,6 +1,8 @@
 from datetime import datetime
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import relationship
+from slugify import slugify
+from sqlalchemy.ext.hybrid import hybrid_property
 
 from app import db
 
@@ -38,6 +40,7 @@ class League(db.Model):
     active = db.Column(db.Boolean())
     start_date = db.Column(db.DateTime())
     teams = relationship("Team")
+    slug = db.Column(db.String(200))
 
     def __init__(self, name="", display_name="", active=False,
                  start_date=datetime.today()):
