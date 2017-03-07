@@ -17,6 +17,9 @@ class Fixture(db.Model):
     away_team_id = db.Column(db.Integer, ForeignKey('teams.id'))
     away_team = relationship("Team", foreign_keys=[away_team_id])
     completed = db.Column(db.Boolean, default=False)
+    fulltime_result = db.Column(db.String())
+    home_goals = db.Column(db.Integer)
+    away_goals = db.Column(db.Integer)
         
     def __repr__(self):
         return '<id: {}> {} vs {}'.format(
@@ -25,7 +28,6 @@ class Fixture(db.Model):
             self.away_team_id,
             self.league_id,
         )
-
 
 class League(db.Model):
     __tablename__ = 'league'

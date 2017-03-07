@@ -1,4 +1,4 @@
-from flask_admin import Admin, expose
+from flask_admin import Admin, expose, BaseView
 from flask_admin.contrib.sqla import ModelView
 from flask_admin.contrib.sqla.ajax import QueryAjaxModelLoader
 from app import app, db
@@ -9,7 +9,7 @@ from flask import request
 from sqlalchemy import or_
 from flask import Response
 from flask import json
-from flask_admin.form import rules
+
 
 admin = Admin(app, name='Football Ratings', template_mode='bootstrap3')
 
@@ -38,6 +38,75 @@ class FilteredAjaxModelLoader(QueryAjaxModelLoader):
             query = query.order_by(self.order_by)
 
         return query.offset(offset).limit(limit).all()
+
+class OptionsView(BaseView):
+    def reset_team(self, team):
+        team.played = 0
+        team.won = 0
+        team.drawn = 0
+        team.lost = 0
+        team.goals_for = 0
+        team.goals_against = 0
+        team.goal_difference = 0
+        team.points = 0
+        return team
+        
+    def update_league_tables(self):
+        try:
+            leagues = db.session.query(League).filter_by(
+                 active = True)
+
+            for league in leagues:
+                fixtures = db.session.query(Fixture).filter_by(
+                    league_id = league.id,
+                    completed = True).order_by(
+                        Fixture.date.desc())
+
+                for team in league.teams:
+                    team = self.reset_team(team)
+
+                for fixture in fixtures:
+                    home_team = fixture.home_team
+                    away_team = fixture.away_team
+
+                    home_team.played += 1
+                    away_team.played += 1
+
+                    home_team.goals_for += fixture.home_goals
+                    home_team.goals_against += fixture.away_goals
+                    away_team.goals_for += fixture.away_goals
+                    away_team.goals_against += fixture.home_goals
+
+                    if fixture.fulltime_result == 'H':
+                        home_team.won += 1
+                        home_team.points += 3
+                        away_team.lost += 1
+                    elif fixture.fulltime_result == 'D':
+                        home_team.drawn += 1
+                        away_team.drawn += 1
+                        home_team.points += 1
+                        away_team.points += 1
+                    else:
+                        home_team.lost += 1
+                        away_team.won += 1
+                        away_team.points += 3
+
+                for team in league.teams:
+                    team.goal_difference = (
+                        team.goals_for - team.goals_against)
+
+            db.session.commit()
+        except:
+            db.session.rollback()
+            
+    @expose('/', methods=('GET', 'POST'))
+    def index(self):
+        if request.method == "POST":
+            if "update_league" in request.form:
+                print("Put logic to handle update league table here.")
+                self.update_league_tables()
+                
+        return self.render('admin/options.html')
 
 class TeamView(ModelView):
     form_excluded_columns = ['team_stats',]
@@ -72,11 +141,18 @@ class FixtureView(ModelView):
             )
         }
 
+    column_list = ('date',
+                    'league',
+                    'home_team',
+                    'away_team',
+                    'fulltime_result',
+                    'completed')
 
     form_columns = ('date',
                     'league',
                     'home_team',
                     'away_team',
+                    'fulltime_result',
                     'completed')
     
 
@@ -109,9 +185,7 @@ class FixtureView(ModelView):
     def on_model_change(self, form, model, is_created):
         print("{}".format(model.home_team.name))
 
-
-
-
+admin.add_view(OptionsView(name='Options', endpoint='options'))
 admin.add_view(FixtureView(Fixture, db.session))
 admin.add_view(ModelView(League, db.session))    
 admin.add_view(TeamView(Team, db.session))

@@ -1,7 +1,7 @@
 from flask import render_template
 
 from app import app, db
-from models import Fixture, Team
+from models import Fixture, Team, League
 
 @app.route('/')
 def index():
@@ -18,10 +18,14 @@ def fixture(fixture_id):
     fixture = db.session.query(Fixture).get(fixture_id)
     return render_template('fixture.html', fixture=fixture)
 
-@app.route('/tables')
-def tables():
-    teams = db.session.query(Team).order_by(Team.points.desc(),
-                                            Team.goal_difference.desc())
+@app.route('/<league_name>/table')
+def table(league_name):
+    league = db.session.query(League).filter_by(
+        display_name = league_name).one()
+    teams = db.session.query(Team).filter_by(
+        league_id = league.id).order_by(
+            Team.points.desc(),
+            Team.goal_difference.desc())
     return render_template('tables.html', teams=teams)
 
 @app.route('/angular')
