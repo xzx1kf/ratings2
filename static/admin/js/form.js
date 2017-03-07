@@ -8,20 +8,25 @@
       */
       function processAjaxWidget($el, name) {
         var multiple = $el.attr('data-multiple') == '1';
-          console.log("hello");
+
+        var filter_by = $el.attr('data-filter-by');
 
         var opts = {
           width: 'resolve',
           minimumInputLength: 1,
           placeholder: 'data-placeholder',
           ajax: {
-            url: $el.attr('data-url'),
+              url: $el.attr('data-url'),
             data: function(term, page) {
-              return {
+              var result = {
                 query: term,
                 offset: (page - 1) * 10,
                 limit: 10
               };
+              if (filter_by) {
+                  result['filter_by'] = $('#' + filter_by).val();
+              }
+              return result;
             },
             results: function(data, page) {
               var results = [];
