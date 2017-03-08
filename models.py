@@ -1,8 +1,6 @@
 from datetime import datetime
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import relationship
-from slugify import slugify
-from sqlalchemy.ext.hybrid import hybrid_property
 
 from app import db
 
@@ -22,7 +20,7 @@ class Fixture(db.Model):
     fulltime_result = db.Column(db.String())
     home_goals = db.Column(db.Integer)
     away_goals = db.Column(db.Integer)
-        
+
     def __repr__(self):
         return '<id: {}> {} vs {}'.format(
             self.id,
@@ -30,6 +28,7 @@ class Fixture(db.Model):
             self.away_team_id,
             self.league_id,
         )
+
 
 class League(db.Model):
     __tablename__ = 'league'
@@ -45,10 +44,11 @@ class League(db.Model):
                                 uselist=False,
                                 back_populates="league")
 
-    def __init__(self, name="", display_name="", active=False,
+    def __init__(self,
+                 name,
+                 active=False,
                  start_date=datetime.today()):
         self.name = name
-        self.display_name = display_name
         self.active = active
         self.start_date = start_date
 
@@ -72,8 +72,8 @@ class League_Stats(db.Model):
 
     def __repr__(self):
         return '<id: {}> {}'.format(self.id, self.league.name)
-    
-    
+
+
 class Team(db.Model):
     __tablename__ = 'teams'
 
@@ -95,8 +95,9 @@ class Team(db.Model):
         back_populates="team"
     )
 
-    def __init__(self, name="", league_id=None):
+    def __init__(self, name, league_id):
         self.name = name
+        self.league_id = league_id
 
     def __repr__(self):
         return '<id: {}> {}'.format(self.id, self.name)
@@ -115,7 +116,6 @@ class Team_Stats(db.Model):
     home_defense_strength = db.Column(db.Float)
     away_attack_strength = db.Column(db.Float)
     away_defense_strength = db.Column(db.Float)
-    
 
     team = relationship(
         "Team", uselist=False, back_populates="team_stats")
