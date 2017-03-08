@@ -20,6 +20,7 @@ def fixture(fixture_id):
 
 @app.route('/<league_name>/table')
 def table(league_name):
+
     league = db.session.query(League).filter_by(
         slug = league_name).one()
     
