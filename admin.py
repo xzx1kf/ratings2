@@ -2,7 +2,7 @@ from flask_admin import Admin, expose, BaseView
 from flask_admin.contrib.sqla import ModelView
 from flask_admin.contrib.sqla.ajax import QueryAjaxModelLoader
 from app import app, db
-from models import Fixture, League, Team, Team_Stats
+from models import Fixture, League, Team, Team_Stats, League_Stats
 
 from flask_admin.model.ajax import DEFAULT_PAGE_SIZE
 from flask import request
@@ -62,26 +62,30 @@ class OptionsView(BaseView):
                 league_id = league.id,
                 completed = True)
 
+            league_stats = db.session.query(League_Stats).filter_by(
+                league = league).first()
+            if not league_stats:
+                league_stats = League_Stats(league)
+                
             home_goals = 0
             away_goals = 0
 
-            number_of_fixtures = fixtures.count()
-
+            # Need to make sure that the number of fixtures is the count
+            # of home/away matches for each team. Or do I?
             for fixture in fixtures:
                 home_goals += fixture.home_goals
                 away_goals += fixture.away_goals
 
-            print("{}/{}".format(home_goals, number_of_fixtures))
-            print("{}/{}".format(away_goals, number_of_fixtures))
-
-            print("League attack strength: {}".format(
-                home_goals / fixtures.count()))
-            print("League defense strength: {}".format(
-                away_goals / fixtures.count()))
+            league_stats.avg_home_goals = home_goals / fixtures.count()
+            league_stats.avg_away_goals = away_goals / fixtures.count()
+        db.session.commit()
 
     def calculate_team_stats(self, number_of_games):
         teams = db.session.query(Team).all()
+        
         for team in teams:
+            league_stats = db.session.query(League_Stats).filter_by(
+                league_id=team.league_id).first()
             team_stats = db.session.query(Team_Stats).filter_by(
                 team=team).first()
             if not team_stats:
@@ -94,19 +98,62 @@ class OptionsView(BaseView):
                 home_team = team).order_by(Fixture.date.desc()).limit(
                     number_of_games)
             team_stats.home_goals = db.session.query(
-                func.sum(home_fixtures.subquery().columns.home_goals))
+                func.sum(home_fixtures.subquery().columns.home_goals)).scalar()
             team_stats.home_goals_conceded = db.session.query(
-                func.sum(home_fixtures.subquery().columns.away_goals))
+                func.sum(home_fixtures.subquery().columns.away_goals)).scalar()
 
             away_fixtures = db.session.query(Fixture).filter_by(
                 away_team = team).order_by(Fixture.date.desc()).limit(
                     number_of_games)
             team_stats.away_goals = db.session.query(
-                func.sum(away_fixtures.subquery().columns.away_goals))
+                func.sum(away_fixtures.subquery().columns.away_goals)).scalar()
             team_stats.away_goals_conceded = db.session.query(
-                func.sum(away_fixtures.subquery().columns.home_goals))
+                func.sum(away_fixtures.subquery().columns.home_goals)).scalar()
 
+            atk_sth = team_stats.home_goals / number_of_games
+            team_stats.home_attack_strength = \
+                                        atk_sth / league_stats.avg_home_goals
+
+            def_sth = team_stats.away_goals_conceded / number_of_games
+            team_stats.away_defense_strength = \
+                                        def_sth / league_stats.avg_home_goals
+
+            atk_sth = team_stats.away_goals / number_of_games
+            team_stats.away_attack_strength = \
+                                        atk_sth / league_stats.avg_away_goals
+
+            def_sth = team_stats.home_goals_conceded / number_of_games
+            team_stats.home_defense_strength = \
+                                        def_sth / league_stats.avg_away_goals
+            
         db.session.commit()
+
+    def calculate_fixture_stats(self):
+        tot = db.session.query(Team).filter_by(name="Tottenham").first()
+        tot_stats = db.session.query(Team_Stats).filter_by(
+            team_id=tot.id).first()
+        
+        league_stats = db.session.query(League_Stats).filter_by(
+            league_id=tot.league_id).first()
+
+        eve = db.session.query(Team).filter_by(name="Everton").first()
+        eve_stats = db.session.query(Team_Stats).filter_by(
+            team_id=eve.id).first()
+
+        tot_pred_goals = (tot_stats.home_attack_strength) * (
+            eve_stats.away_defense_strength) * (
+                league_stats.avg_home_goals)
+
+        eve_pred_goals = (eve_stats.away_attack_strength) * (
+            tot_stats.home_defense_strength) * (
+                league_stats.avg_away_goals)
+
+        print("{} {} vs {} {}".format(
+            tot.name,
+            tot_pred_goals,
+            eve_pred_goals,
+            eve.name))
+        
                      
     def update_league_tables(self):
         try:
@@ -163,7 +210,8 @@ class OptionsView(BaseView):
                 self.update_league_tables()
             elif "calculate_league_stats" in request.form:
                 self.calculate_league_stats()
-                self.calculate_team_stats()
+                self.calculate_team_stats(number_of_games=19)
+                self.calculate_fixture_stats()
         return self.render('admin/options.html')
 
 class TeamView(ModelView):
@@ -245,6 +293,7 @@ class FixtureView(ModelView):
 
 admin.add_view(OptionsView(name='Options', endpoint='options'))
 admin.add_view(FixtureView(Fixture, db.session))
-admin.add_view(ModelView(League, db.session))    
+admin.add_view(ModelView(League, db.session))
+admin.add_view(ModelView(League_Stats, db.session))
 admin.add_view(TeamView(Team, db.session))
 admin.add_view(ModelView(Team_Stats, db.session))

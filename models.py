@@ -41,6 +41,9 @@ class League(db.Model):
     start_date = db.Column(db.DateTime())
     teams = relationship("Team")
     slug = db.Column(db.String(200))
+    league_stats = relationship("League_Stats",
+                                uselist=False,
+                                back_populates="league")
 
     def __init__(self, name="", display_name="", active=False,
                  start_date=datetime.today()):
@@ -52,6 +55,24 @@ class League(db.Model):
     def __repr__(self):
         return '<id: {}> {}'.format(self.id, self.name)
 
+
+class League_Stats(db.Model):
+    __tablename__ = 'league_stats'
+
+    id = db.Column(db.Integer, primary_key=True)
+    league_id = db.Column(db.Integer, ForeignKey('league.id'))
+    league = relationship("League",
+                          uselist=False,
+                          back_populates="league_stats")
+    avg_home_goals = db.Column(db.Float)
+    avg_away_goals = db.Column(db.Float)
+
+    def __init__(self, league):
+        self.league = league
+
+    def __repr__(self):
+        return '<id: {}> {}'.format(self.id, self.league.name)
+    
     
 class Team(db.Model):
     __tablename__ = 'teams'
@@ -90,6 +111,11 @@ class Team_Stats(db.Model):
     away_goals = db.Column(db.Integer, default=0)
     home_goals_conceded = db.Column(db.Integer, default=0)
     away_goals_conceded = db.Column(db.Integer, default=0)
+    home_attack_strength = db.Column(db.Float)
+    home_defense_strength = db.Column(db.Float)
+    away_attack_strength = db.Column(db.Float)
+    away_defense_strength = db.Column(db.Float)
+    
 
     team = relationship(
         "Team", uselist=False, back_populates="team_stats")
