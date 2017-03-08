@@ -94,12 +94,8 @@ class Team_Stats(db.Model):
     team = relationship(
         "Team", uselist=False, back_populates="team_stats")
 
-    def __init__(self, home_goals=0, away_goals=0,
-                 home_goals_conceded=0, away_goals_conceded=0):
-        self.home_goals=home_goals
-        self.away_goals=away_goals
-        self.home_goals_conceded=home_goals_conceded
-        self.away_goals_conceded=away_goals_conceded
+    def __init__(self, team):
+        self.team = team
 
     def __repr__(self):
         return '<id: {}> team_id: {}'.format(self.id, self.team_id)

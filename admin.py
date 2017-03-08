@@ -10,6 +10,8 @@ from sqlalchemy import or_
 from flask import Response
 from flask import json
 
+from sqlalchemy.sql import func, label, exists
+
 
 admin = Admin(app, name='Football Ratings', template_mode='bootstrap3')
 
@@ -71,11 +73,41 @@ class OptionsView(BaseView):
 
             print("{}/{}".format(home_goals, number_of_fixtures))
             print("{}/{}".format(away_goals, number_of_fixtures))
-        pass
 
-    def calculate_team_stats(self):
-        pass
-        
+            print("League attack strength: {}".format(
+                home_goals / fixtures.count()))
+            print("League defense strength: {}".format(
+                away_goals / fixtures.count()))
+
+    def calculate_team_stats(self, number_of_games):
+        teams = db.session.query(Team).all()
+        for team in teams:
+            team_stats = db.session.query(Team_Stats).filter_by(
+                team=team).first()
+            if not team_stats:
+                team_stats = Team_Stats(team)
+
+            # By using the subquery function I first select the records
+            # that I'm interested in, then use this as a subquery for the
+            # sum function query.
+            home_fixtures = db.session.query(Fixture).filter_by(
+                home_team = team).order_by(Fixture.date.desc()).limit(
+                    number_of_games)
+            team_stats.home_goals = db.session.query(
+                func.sum(home_fixtures.subquery().columns.home_goals))
+            team_stats.home_goals_conceded = db.session.query(
+                func.sum(home_fixtures.subquery().columns.away_goals))
+
+            away_fixtures = db.session.query(Fixture).filter_by(
+                away_team = team).order_by(Fixture.date.desc()).limit(
+                    number_of_games)
+            team_stats.away_goals = db.session.query(
+                func.sum(away_fixtures.subquery().columns.away_goals))
+            team_stats.away_goals_conceded = db.session.query(
+                func.sum(away_fixtures.subquery().columns.home_goals))
+
+        db.session.commit()
+                     
     def update_league_tables(self):
         try:
             leagues = db.session.query(League).filter_by(
@@ -131,6 +163,7 @@ class OptionsView(BaseView):
                 self.update_league_tables()
             elif "calculate_league_stats" in request.form:
                 self.calculate_league_stats()
+                self.calculate_team_stats()
         return self.render('admin/options.html')
 
 class TeamView(ModelView):
