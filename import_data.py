@@ -61,6 +61,9 @@ def import_fixture_data(csv_file):
                 away_team_name = row['AwayTeam']
                 league = db.session.query(League).filter_by(
                     name = league_name).one()
+                print(home_team_name)
+                print(away_team_name)
+                print(league_name)
                 home_team = db.session.query(Team).filter_by(
                     name = home_team_name).one()
                 away_team = db.session.query(Team).filter_by(
