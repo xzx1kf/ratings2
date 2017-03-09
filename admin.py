@@ -47,7 +47,6 @@ class OptionsView(BaseView):
             elif "calculate_league_stats" in request.form:
                 calculate.league_stats()
                 calculate.team_stats(number_of_games=19)
-                print(calculate.fixture_stats.__doc__)
                 calculate.fixture_stats()
         return self.render('admin/options.html')
 
@@ -121,11 +120,11 @@ class FixtureView(ModelView):
                 query, offset, limit)]
         return Response(json.dumps(data), mimetype='application/json')
 
-    """
-    The on_model_change allows me to insert some logic. So in the case
-    of the fixture save I can calculate fixture stats etc
-    """
     def on_model_change(self, form, model, is_created):
+        """
+        The on_model_change allows me to insert some logic. So in the case
+        of the fixture save I can calculate fixture stats etc...
+        """
         print("{}".format(model.home_team.name))
 
 

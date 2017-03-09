@@ -88,6 +88,13 @@ class Prediction(db.Model):
                            back_populates="prediction")
     home_goals = db.Column(db.Float)
     away_goals = db.Column(db.Float)
+    home_win = db.Column(db.Float)
+    away_win = db.Column(db.Float)
+    draw = db.Column(db.Float)
+    over = db.Column(db.Float)
+    under = db.Column(db.Float)
+    home_goals_pmf = db.Column(db.PickleType)
+    away_goals_pmf = db.Column(db.PickleType)
 
     def __init__(self, fixture):
         self.fixture = fixture
