@@ -20,13 +20,16 @@ class Fixture(db.Model):
     fulltime_result = db.Column(db.String())
     home_goals = db.Column(db.Integer)
     away_goals = db.Column(db.Integer)
+    prediction = relationship("Prediction",
+                              uselist=False,
+                              back_populates="fixture")
 
     def __repr__(self):
-        return '<id: {}> {} vs {}'.format(
+        return '<id: {}> {} - {} vs {}'.format(
             self.id,
-            self.home_team_id,
-            self.away_team_id,
-            self.league_id,
+            self.league.display_name,
+            self.home_team.name,
+            self.away_team.name,
         )
 
 
@@ -72,6 +75,25 @@ class League_Stats(db.Model):
 
     def __repr__(self):
         return '<id: {}> {}'.format(self.id, self.league.name)
+
+
+class Prediction(db.Model):
+    __tablename__ = 'prediction'
+
+    id = db.Column(db.Integer, primary_key=True)
+    fixture_id = db.Column(db.Integer, ForeignKey('fixture.id'))
+    fixture = relationship("Fixture",
+                           foreign_keys=[fixture_id],
+                           uselist=False,
+                           back_populates="prediction")
+    home_goals = db.Column(db.Float)
+    away_goals = db.Column(db.Float)
+
+    def __init__(self, fixture):
+        self.fixture = fixture
+
+    def __repr__(self):
+        return '<id: {}> {}'.format(self.id)
 
 
 class Team(db.Model):

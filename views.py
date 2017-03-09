@@ -10,16 +10,33 @@ def index():
     return render_template('index.html', teams=teams)
 
 
-@app.route('/fixtures')
-def fixtures():
-    fixtures = db.session.query(Fixture).order_by(Fixture.date)
+@app.route('/<league_name>/fixtures')
+def fixtures(league_name):
+    league = db.session.query(League).filter_by(
+        slug=league_name,
+        active=True).one()
+    fixtures = db.session.query(Fixture).filter_by(
+        completed=False,
+        league_id=league.id).order_by(Fixture.date)
     return render_template('fixtures.html', fixtures=fixtures)
 
 
-@app.route('/fixtures/<fixture_id>')
-def fixture(fixture_id):
+@app.route('/<league_name>/fixtures/<fixture_id>')
+def fixture(league_name, fixture_id):
     fixture = db.session.query(Fixture).get(fixture_id)
-    return render_template('fixture.html', fixture=fixture)
+    return render_template('fixture.html',
+                           fixture=fixture)
+
+
+@app.route('/<league_name>/results')
+def results(league_name):
+    league = db.session.query(League).filter_by(
+        slug=league_name,
+        active=True).one()
+    results = db.session.query(Fixture).filter_by(
+        league_id=league.id,
+        completed=True,)
+    return render_template('results.html', results=results)
 
 
 @app.route('/<league_name>/table')
