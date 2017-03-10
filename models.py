@@ -48,7 +48,7 @@ class League(db.Model):
                                 back_populates="league")
 
     def __init__(self,
-                 name,
+                 name="",
                  active=False,
                  start_date=datetime.today()):
         self.name = name

@@ -96,21 +96,23 @@ def league_stats():
             league_id=league.id,
             completed=True).limit(380)
 
-        if fixtures.count() == 0:
-            continue
-
-        home_goals = db.session.query(
-            func.sum(fixtures.subquery().columns.home_goals)).scalar()
-        away_goals = db.session.query(
-            func.sum(fixtures.subquery().columns.away_goals)).scalar()
-
         league_stats = db.session.query(League_Stats).filter_by(
             league=league).first()
+
         if not league_stats:
             league_stats = League_Stats(league)
 
-        league_stats.avg_home_goals = home_goals / fixtures.count()
-        league_stats.avg_away_goals = away_goals / fixtures.count()
+        if fixtures.count() == 0:
+            league_stats.avg_home_goals = 1
+            league_stats.avg_away_goals = 1
+        else:
+            home_goals = db.session.query(
+                func.sum(fixtures.subquery().columns.home_goals)).scalar()
+            away_goals = db.session.query(
+                func.sum(fixtures.subquery().columns.away_goals)).scalar()
+
+            league_stats.avg_home_goals = home_goals / fixtures.count()
+            league_stats.avg_away_goals = away_goals / fixtures.count()
     db.session.commit()
 
 

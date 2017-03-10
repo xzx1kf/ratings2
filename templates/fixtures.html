@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
-  <table class="table">
+  <table class="table table-hover">
     <thead>
       <th>Date</th>
       <th>Home Team</th>
@@ -21,17 +21,17 @@
 	<td>{{ fixture.home_team.name }}</td>
 	<td>{{ fixture.away_team.name }}</td>
         {% set home_win = fixture.prediction.home_win * 100 %}
-        <td>{{ home_win|round(2) }}%</td>
+        <td>{{ home_win|round|int }}%</td>
         {% set draw = fixture.prediction.draw * 100 %}
-        <td>{{ draw|round(2) }}%</td>
+        <td>{{ draw|round|int }}%</td>
         {% set away_win = fixture.prediction.away_win * 100 %}
-        <td>{{ away_win|round(2) }}%</td>
+        <td>{{ away_win|round|int }}%</td>
         <td>{{ fixture.prediction.home_goals|round|int }}</td>
         <td>{{ fixture.prediction.away_goals|round|int }}</td>
         {% set over = fixture.prediction.over * 100 %}
         {% set under = fixture.prediction.under * 100 %}
-        <td>{{ over|round(2) }}%</td>
-        <td>{{ under|round(2) }}%</td>
+        <td>{{ over|round|int }}%</td>
+        <td>{{ under|round|int }}%</td>
         <td><a href="{{ url_for('fixture', fixture_id=fixture.id, league_name=fixture.league.slug) }}">details</a>
       </tr>
       {% endfor %}
