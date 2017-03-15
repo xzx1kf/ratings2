@@ -41,7 +41,7 @@ class League(db.Model):
     display_name = db.Column(db.String())
     active = db.Column(db.Boolean())
     start_date = db.Column(db.DateTime())
-    teams = relationship("Team")
+    teams = relationship("Team", order_by="desc(Team.points)")
     slug = db.Column(db.String(200))
     league_stats = relationship("League_Stats",
                                 uselist=False,
@@ -108,6 +108,7 @@ class Team(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String())
+    position = db.Column(db.Integer)
     played = db.Column(db.Integer, default=0)
     won = db.Column(db.Integer, default=0)
     drawn = db.Column(db.Integer, default=0)

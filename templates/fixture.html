@@ -1,4 +1,58 @@
 {% extends "base.html" %}
 {% block content %}
-<span>{{ fixture.home_team.name }} vs {{ fixture.away_team.name }}</span>
+<div class="row">
+  <div class="col-md-4">
+    {{ fixture.home_team.name }} ({{ fixture.home_team.position }})
+  </div>
+  <div class="col-md-4">vs</div>
+  <div class="col-md-4">
+    {{ fixture.away_team.name }} ({{ fixture.away_team.position }})
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-4">
+    {{ fixture.prediction.home_goals|round|int }}
+  </div>
+  <div class="col-md-4">- Predicted Score -</div>
+  <div class="col-md-4">
+    {{ fixture.prediction.away_goals|round|int }}
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-6">
+    <table class="table">
+      <tr>
+        <th></th>
+        <th>1</th>
+        <th>X</th>
+        <th>2</th>
+      </tr>
+      <tr>
+        <td>Probability</td>
+        {% set home_win = fixture.prediction.home_win * 100 %}
+        {% set draw = fixture.prediction.draw * 100 %}
+        {% set away_win = fixture.prediction.away_win * 100 %}
+        <td>{{ home_win|round|int }}%</td>
+        <td>{{ draw|round|int }}%</td>
+        <td>{{ away_win|round|int }}%</td>
+      </tr>
+    </table>
+  </div>
+  <div class="col-md-6">
+    <table class="table">
+      <tr>
+        <th></th>
+        <th>Over 2.5</th>
+        <th>Under 2.5</th>
+      </tr>
+      <tr>
+        {% set over = fixture.prediction.over * 100 %}
+        {% set under = fixture.prediction.under * 100 %}
+        <td>Probability</td>
+        <td>{{ over|round|int }}%</td>
+        <td>{{ under|round|int }}%</td>
+      </tr>
+    </table>
+  </div>
+</div>
 {% endblock %}

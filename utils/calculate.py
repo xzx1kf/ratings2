@@ -231,8 +231,9 @@ def league_tables():
                 away_team.won += 1
                 away_team.points += 3
 
-        for team in league.teams:
+        for pos, team in enumerate(league.teams):
             team.goal_difference = (
                 team.goals_for - team.goals_against)
+            team.position = pos + 1
 
     db.session.commit()
