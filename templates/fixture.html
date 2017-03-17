@@ -1,26 +1,26 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="row">
-  <div class="col-md-4">
-    {{ fixture.home_team.name }} ({{ fixture.home_team.position }})
+  <div class="col-md-4" align="center">
+    <h3>{{ fixture.home_team.name }} ({{ fixture.home_team.position }})</h3>
   </div>
-  <div class="col-md-4">vs</div>
-  <div class="col-md-4">
-    {{ fixture.away_team.name }} ({{ fixture.away_team.position }})
-  </div>
-</div>
-<div class="row">
-  <div class="col-md-4">
-    {{ fixture.prediction.home_goals|round|int }}
-  </div>
-  <div class="col-md-4">- Predicted Score -</div>
-  <div class="col-md-4">
-    {{ fixture.prediction.away_goals|round|int }}
+  <div class="col-md-4" align="center"><h3>vs</h3></div>
+  <div class="col-md-4" align="center">
+    <h3>{{ fixture.away_team.name }} ({{ fixture.away_team.position }})</h3>
   </div>
 </div>
 <div class="row">
-  <div class="col-md-6">
-    <table class="table">
+  <div class="col-md-4" align="center">
+    <h4>{{ fixture.prediction.home_goals|round|int }}</h4>
+  </div>
+  <div class="col-md-4" align="center"><h4>- Predicted Score -</h4></div>
+  <div class="col-md-4" align="center">
+    <h4>{{ fixture.prediction.away_goals|round|int }}</h4>
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-6" align="center">
+    <table class="table table-condensed">
       <tr>
         <th></th>
         <th>1</th>
@@ -32,14 +32,48 @@
         {% set home_win = fixture.prediction.home_win * 100 %}
         {% set draw = fixture.prediction.draw * 100 %}
         {% set away_win = fixture.prediction.away_win * 100 %}
-        <td>{{ home_win|round|int }}%</td>
-        <td>{{ draw|round|int }}%</td>
-        <td>{{ away_win|round|int }}%</td>
+        <td>{{ '%0.1f'|format(home_win) }}%</td>
+        <td>{{ '%0.1f'|format(draw) }}%</td>
+        <td>{{ '%0.1f'|format(away_win) }}%</td>
+      </tr>
+      <tr>
+        <td>Odds</td>
+        <td>{{ fixture.odds.home }}</td>
+        <td>{{ fixture.odds.draw }}</td>
+        <td>{{ fixture.odds.away }}</td>
+      </tr>
+      <tr>
+        <td>Expected Value</td>
+        {% set home_ev = fixture.prediction.home_win * fixture.odds.home %}
+        {% if home_ev >= 1 %}
+        <td class="text-success">{{ '%0.2f'|format(home_ev) }}</td>
+        {% else %}
+        <td>{{ '%0.2f'|format(home_ev) }}</td>
+        {% endif %}
+        {% set draw_ev = fixture.prediction.draw * fixture.odds.draw %}
+        {% if draw_ev >= 1 %}
+        <td class="text-success">{{ '%0.2f'|format(draw_ev) }}</td>
+        {% else %}
+        <td>{{ '%0.2f'|format(draw_ev) }}</td>
+        {% endif %}
+        <td>{{ (fixture.prediction.away_win * fixture.odds.away)|round(2) }}</td>
+      </tr>
+      <tr class="bg-danger">
+        <td>Stake</td>
+        {% set home_stake = (100 /
+          (2 * fixture.odds.home * (1 - fixture.prediction.home_win))) %}
+        {% set draw_stake = (100 /
+          (2 * fixture.odds.draw * (1 - fixture.prediction.draw))) %}
+        {% set away_stake = (100 /
+          (2 * fixture.odds.away * (1 - fixture.prediction.away_win))) %}
+        <td>{{ '£%6.2f'|format(home_stake) }}</td>
+        <td>{{ '£%6.2f'|format(draw_stake) }}</td>
+        <td>{{ '£%6.2f'|format(away_stake) }}</td>
       </tr>
     </table>
   </div>
   <div class="col-md-6">
-    <table class="table">
+    <table class="table table-condensed">
       <tr>
         <th></th>
         <th>Over 2.5</th>
@@ -52,7 +86,25 @@
         <td>{{ over|round|int }}%</td>
         <td>{{ under|round|int }}%</td>
       </tr>
+      <tr>
+        <td>Odds</td>
+        <td>{{ fixture.odds.over }}</td>
+        <td>{{ fixture.odds.under }}</td>
+      </tr>
     </table>
   </div>
 </div>
+<div class="row">
+  <div class="col-md-6">
+    <table class="table table-condensed">
+      <thead>
+        <tr class="bg-warning">
+          <th>0</th>
+          <th>1</th>
+        </tr>
+      </thead>
+    </table>
+  </div>
+</div>
+
 {% endblock %}

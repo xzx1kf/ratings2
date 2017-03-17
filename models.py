@@ -1,5 +1,5 @@
 from datetime import datetime
-from sqlalchemy import ForeignKey
+from sqlalchemy import ForeignKey, UniqueConstraint
 from sqlalchemy.orm import relationship
 
 from app import db
@@ -23,11 +23,20 @@ class Fixture(db.Model):
     prediction = relationship("Prediction",
                               uselist=False,
                               back_populates="fixture")
-
+    odds = relationship("Odds",
+                        uselist=False,
+                        back_populates="fixture")
+    
     def __repr__(self):
-        return '<id: {}> {} - {} vs {}'.format(
+        return 'Fixture(id={}, date={}, home_team={}, away_team={})'.format(
             self.id,
-            self.league.display_name,
+            self.date,
+            self.home_team,
+            self.away_team)
+    
+    def __str__(self):
+        return '{:%d/%m/%y %H:%M} - {} vs {}'.format(
+            self.date,
             self.home_team.name,
             self.away_team.name,
         )
@@ -58,6 +67,9 @@ class League(db.Model):
     def __repr__(self):
         return '<id: {}> {}'.format(self.id, self.name)
 
+    def __str__(self):
+        return '{}'.format(self.display_name)
+
 
 class League_Stats(db.Model):
     __tablename__ = 'league_stats'
@@ -77,6 +89,38 @@ class League_Stats(db.Model):
         return '<id: {}> {}'.format(self.id, self.league.name)
 
 
+class Odds(db.Model):
+    __tablename__ = 'odds'
+    __table_args__ = (UniqueConstraint('fixture_id'),)
+
+    id = db.Column(db.Integer, primary_key=True)
+    fixture_id = db.Column(db.Integer, ForeignKey('fixture.id'))
+    fixture = relationship("Fixture",
+                           foreign_keys=[fixture_id],
+                           uselist=False,
+                           back_populates="odds")
+    home = db.Column(db.Float)
+    draw = db.Column(db.Float)
+    away = db.Column(db.Float)
+    over = db.Column(db.Float)
+    under = db.Column(db.Float)
+
+    def __init__(self, home=0, draw=0, away=0, over=0, under=0):
+        self.home = home
+        self.draw = draw
+        self.away = away
+        self.over = over
+        self.under = under
+        
+    def __repr__(self):
+        return 'Odds(home={}, draw={}, away={}, over={}, under={})'.format(
+            self.home,
+            self.draw,
+            self.away,
+            self.over,
+            self.under)
+
+    
 class Prediction(db.Model):
     __tablename__ = 'prediction'
 
@@ -131,6 +175,9 @@ class Team(db.Model):
 
     def __repr__(self):
         return '<id: {}> {}'.format(self.id, self.name)
+
+    def __str__(self):
+        return '{}'.format(self.name)
 
 
 class Team_Stats(db.Model):

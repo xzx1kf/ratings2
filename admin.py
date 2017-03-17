@@ -7,6 +7,7 @@ from sqlalchemy import or_
 
 from app import app, db
 from models import Fixture, League, League_Stats, Prediction, Team, Team_Stats
+from models import Odds
 from utils import calculate
 
 admin = Admin(app, name='Football Ratings', template_mode='bootstrap3')
@@ -53,6 +54,14 @@ class OptionsView(BaseView):
 
 class TeamView(ModelView):
     form_excluded_columns = ['team_stats', ]
+
+
+class OddsView(ModelView):
+    def filtering_function():
+        return db.session.query(Fixture).filter_by(completed=False)
+
+    form_args = dict(
+        fixture=dict(label='Fixture', query_factory=filtering_function))
 
 
 class FixtureView(ModelView):
@@ -135,3 +144,4 @@ admin.add_view(ModelView(League_Stats, db.session))
 admin.add_view(ModelView(Prediction, db.session))
 admin.add_view(TeamView(Team, db.session))
 admin.add_view(ModelView(Team_Stats, db.session))
+admin.add_view(OddsView(Odds, db.session))
