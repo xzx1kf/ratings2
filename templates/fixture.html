@@ -1,4 +1,37 @@
 {% extends "base.html" %}
+
+{% macro last_5_table(team, fixtures, location="") -%}
+  <table class="table table-condensed">
+    <thead>
+      <tr>
+        <th colspan="4">{{ team.name }}'s last 5 {{ location }} matches</th>
+      </tr>
+      <tr>
+        <th>Date</th>
+        <th>Home Team</th>
+        <th>HG</th>
+        <th>AG</th>
+        <th>Away Team</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for fixture in fixtures %}
+      <tr>
+        <td>{{ fixture.date.strftime("%d/%m/%y") }}</td>
+        <td>{{ fixture.home_team.name }}</td>
+        <td>{{ fixture.home_goals }}</td>
+        <td>{{ fixture.away_goals }}</td>
+        <td>{{ fixture.away_team.name }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{%- endmacro %}
+
+
+
+
+
 {% block content %}
 <div class="row">
   <div class="col-md-4" align="center">
@@ -91,19 +124,78 @@
         <td>{{ fixture.odds.over }}</td>
         <td>{{ fixture.odds.under }}</td>
       </tr>
+      <tr>
+        <td>Expected Value</td>
+        {% set over_ev = fixture.prediction.over * fixture.odds.over %}
+        {% if over_ev >= 1 %}
+        <td class="text-success">{{ '%0.2f'|format(over_ev) }}</td>
+        {% else %}
+        <td>{{ '%0.2f'|format(over_ev) }}</td>
+        {% endif %}
+        {% set under_ev = fixture.prediction.under * fixture.odds.under %}
+        {% if under_ev >= 1 %}
+        <td class="text-success">{{ '%0.2f'|format(under_ev) }}</td>
+        {% else %}
+        <td>{{ '%0.2f'|format(under_ev) }}</td>
+        {% endif %}
+      </tr>
+      <tr>
+        <td>Stake</td>
+        <td></td>
+        <td></td>
+      </tr>
     </table>
   </div>
 </div>
 <div class="row">
-  <div class="col-md-6">
+  <div class="col-md-offset-3 col-md-6">
     <table class="table table-condensed">
       <thead>
         <tr class="bg-warning">
+          <th>Goals</th>
           <th>0</th>
           <th>1</th>
+          <th>2</th>
+          <th>3</th>
+          <th>4</th>
+          <th>5</th>
         </tr>
       </thead>
+      <tbody>
+        <tr>
+          <td>{{ fixture.home_team.name }}</td>
+          {% for i in range(6) %}
+          {% set home_pmf = fixture.prediction.home_goals_pmf[i] * 100 %}
+          <td>{{ '%4.2f'|format(home_pmf) }}%</td>
+          {% endfor %}
+        </tr>
+        <tr>
+          <td>{{ fixture.away_team.name }}</td>
+          {% for i in range(6) %}
+          {% set away_pmf = fixture.prediction.away_goals_pmf[i] * 100 %}
+          <td>{{ '%4.2f'|format(away_pmf) }}%</td>
+          {% endfor %}
+        </tr>
+      </tbody>
     </table>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-6">
+    {{ last_5_table(fixture.home_team, home_all_fixtures) }}
+  </div>
+  <div class="col-md-6">
+    {{ last_5_table(fixture.away_team, away_all_fixtures) }}
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-6">
+    {{ last_5_table(fixture.home_team, home_fixtures, "home") }}
+  </div>
+  <div class="col-md-6">
+    {{ last_5_table(fixture.away_team, away_fixtures, "away") }}
   </div>
 </div>
 

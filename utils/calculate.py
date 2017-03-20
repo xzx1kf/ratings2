@@ -3,6 +3,7 @@ from sqlalchemy.sql import func
 
 from app import db
 from models import Fixture, League, League_Stats, Prediction, Team, Team_Stats
+from models import Odds
 
 
 def fixture_stats():
@@ -39,6 +40,13 @@ def fixture_stats():
         prediction.away_goals = away_goals
 
         _fixture_probabilities(fixture, prediction)
+
+        odds = db.session.query(Odds).filter_by(
+            fixture_id=fixture.id).first()
+
+        if not odds:
+            odds = Odds(fixture)
+            
     db.session.commit()
 
 

@@ -105,7 +105,8 @@ class Odds(db.Model):
     over = db.Column(db.Float)
     under = db.Column(db.Float)
 
-    def __init__(self, home=0, draw=0, away=0, over=0, under=0):
+    def __init__(self, fixture, home=1, draw=1, away=1, over=1, under=1):
+        self.fixture = fixture
         self.home = home
         self.draw = draw
         self.away = away
@@ -140,8 +141,16 @@ class Prediction(db.Model):
     home_goals_pmf = db.Column(db.PickleType)
     away_goals_pmf = db.Column(db.PickleType)
 
-    def __init__(self, fixture):
+    def __init__(self, fixture, home_goals=0, away_goals=0, home_win=0,
+                 away_win=0, draw=0, over=0, under=0):
         self.fixture = fixture
+        self.home_goals = home_goals
+        self.away_goals = away_goals
+        self.home_win = home_win
+        self.away_win = away_win
+        self.draw = draw
+        self.over = over
+        self.under = under
 
     def __repr__(self):
         return '<id: {}> {}'.format(self.id)

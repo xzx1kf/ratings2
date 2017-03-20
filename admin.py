@@ -105,6 +105,8 @@ class FixtureView(ModelView):
                     'league',
                     'home_team',
                     'away_team',
+                    'home_goals',
+                    'away_goals',
                     'fulltime_result',
                     'completed')
 
@@ -134,7 +136,6 @@ class FixtureView(ModelView):
         The on_model_change allows me to insert some logic. So in the case
         of the fixture save I can calculate fixture stats etc...
         """
-        print("{}".format(model.home_team.name))
 
 
 admin.add_view(OptionsView(name='Options', endpoint='options'))
