@@ -55,6 +55,7 @@ class League(db.Model):
     league_stats = relationship("League_Stats",
                                 uselist=False,
                                 back_populates="league")
+    betfair_name = db.Column(db.String(200))
 
     def __init__(self,
                  name="",
@@ -171,6 +172,7 @@ class Team(db.Model):
     goal_difference = db.Column(db.Integer, default=0)
     points = db.Column(db.Integer, default=0)
     league_id = db.Column(db.Integer, ForeignKey('league.id'))
+    betfair_name = db.Column(db.String(200))
 
     team_stats = relationship(
         "Team_Stats",

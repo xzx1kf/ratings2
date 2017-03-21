@@ -39,7 +39,7 @@ def fixture_stats():
         prediction.home_goals = home_goals
         prediction.away_goals = away_goals
 
-        _fixture_probabilities(fixture, prediction)
+        prediction = _fixture_probabilities(fixture, prediction)
 
         odds = db.session.query(Odds).filter_by(
             fixture_id=fixture.id).first()
@@ -90,6 +90,8 @@ def _fixture_probabilities(fixture, prediction):
     prediction.under = under_over['under']
     prediction.home_goals_pmf = home
     prediction.away_goals_pmf = away
+
+    return prediction
 
 
 def league_stats():
