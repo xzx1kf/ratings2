@@ -26,14 +26,14 @@ class Fixture(db.Model):
     odds = relationship("Odds",
                         uselist=False,
                         back_populates="fixture")
-    
+
     def __repr__(self):
         return 'Fixture(id={}, date={}, home_team={}, away_team={})'.format(
             self.id,
             self.date,
             self.home_team,
             self.away_team)
-    
+
     def __str__(self):
         return '{:%d/%m/%y %H:%M} - {} vs {}'.format(
             self.date,
@@ -44,6 +44,8 @@ class Fixture(db.Model):
 
 class League(db.Model):
     __tablename__ = 'league'
+    __table_args__ = (UniqueConstraint('name'),
+                      UniqueConstraint('slug'))
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String())
@@ -64,9 +66,16 @@ class League(db.Model):
         self.name = name
         self.active = active
         self.start_date = start_date
+        self.slug = self.name
+        self.betfair_name = self.name
+        self.display_name = self.name
 
     def __repr__(self):
-        return '<id: {}> {}'.format(self.id, self.name)
+        return 'League(id={}, name={}, active={}, start_date={}'.format(
+            self.id,
+            self.name,
+            self.active,
+            self.start)
 
     def __str__(self):
         return '{}'.format(self.display_name)
@@ -122,7 +131,7 @@ class Odds(db.Model):
             self.over,
             self.under)
 
-    
+
 class Prediction(db.Model):
     __tablename__ = 'prediction'
 

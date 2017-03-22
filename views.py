@@ -29,19 +29,19 @@ def fixture(league_name, fixture_id):
         completed=True,
         home_team_id=fixture.home_team_id).order_by(Fixture.date.desc())[:5]
     home_all_fixtures = db.session.query(Fixture).filter(
-        Fixture.completed==True,
+        Fixture.completed == True,
         (or_(
-            Fixture.home_team_id==fixture.home_team_id,
-            Fixture.away_team_id==fixture.home_team_id
+            Fixture.home_team_id == fixture.home_team_id,
+            Fixture.away_team_id == fixture.home_team_id
         ))).order_by(Fixture.date.desc())[:5]
     away_fixtures = db.session.query(Fixture).filter_by(
         completed=True,
         away_team_id=fixture.away_team_id).order_by(Fixture.date.desc())[:5]
     away_all_fixtures = db.session.query(Fixture).filter(
-        Fixture.completed==True,
+        Fixture.completed == True,
         (or_(
-            Fixture.home_team_id==fixture.away_team_id,
-            Fixture.away_team_id==fixture.away_team_id
+            Fixture.home_team_id == fixture.away_team_id,
+            Fixture.away_team_id == fixture.away_team_id
         ))).order_by(Fixture.date.desc())[:5]
     return render_template('fixture.html',
                            fixture=fixture,
