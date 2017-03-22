@@ -80,17 +80,10 @@ class TestCase(unittest.TestCase):
         fixtures = db.session.query(Fixture).filter_by(
             completed=False,
             league_id=league.id).order_by(Fixture.date)
-        
-        print(fixtures[0])
-        print(league.slug)
-        print(fixture)
 
-        r = requests.get('http://localhost:5000/')
-        print(r)
-        
-        rv = self.app.get('/')
-        
-        print(rv)
+        rv = self.app.get('/testleague1/fixtures')
+        print(rv.status_code)
+        self.assertEqual(rv.status_code, "200")
 
 
 if __name__ == '__main__':
