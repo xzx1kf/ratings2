@@ -1,15 +1,12 @@
 import os
 import unittest
 from datetime import datetime
-
-from flask import url_for
-
+from sqlalchemy.exc import IntegrityError
 from config import basedir
 from app import app, db
 from models import League, Team, Fixture
 from utils import calculate
 
-from sqlalchemy.exc import IntegrityError
 from views import *
 
 
