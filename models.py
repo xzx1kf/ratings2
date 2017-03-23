@@ -77,7 +77,7 @@ class League(db.Model):
             self.active,
             self.start)
 
-    def __str__(self):
+    def __unicode__(self):
         return '{}'.format(self.display_name)
 
 

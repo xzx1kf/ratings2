@@ -179,19 +179,35 @@ def team_stats(number_of_games):
         team_stats.away_goals_conceded = db.session.query(
             func.sum(away_fixtures.subquery().columns.home_goals)).scalar()
 
-        atk_sth = team_stats.home_goals / number_of_games
+        if team_stats.home_goals:
+            atk_sth = team_stats.home_goals / number_of_games
+        else:
+            atk_sth = 1
+            
         team_stats.home_attack_strength = \
             atk_sth / league_stats.avg_home_goals
 
-        def_sth = team_stats.away_goals_conceded / number_of_games
+        if team_stats.away_goals_conceded:
+            def_sth = team_stats.away_goals_conceded / number_of_games
+        else:
+            def_sth = 1
+            
         team_stats.away_defense_strength = \
             def_sth / league_stats.avg_home_goals
 
-        atk_sth = team_stats.away_goals / number_of_games
+        if team_stats.away_goals:
+            atk_sth = team_stats.away_goals / number_of_games
+        else:
+            atk_sth = 1
+            
         team_stats.away_attack_strength = \
             atk_sth / league_stats.avg_away_goals
 
-        def_sth = team_stats.home_goals_conceded / number_of_games
+        if team_stats.home_goals_conceded:
+            def_sth = team_stats.home_goals_conceded / number_of_games
+        else:
+            def_sth = 1
+            
         team_stats.home_defense_strength = \
             def_sth / league_stats.avg_away_goals
 

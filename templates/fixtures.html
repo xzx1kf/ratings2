@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
-<p>No fixtures to display</p>
+{% if fixtures.count() > 0 %}
   <table class="table table-hover">
     <thead>
       <th>Date</th>
@@ -38,4 +38,7 @@
       {% endfor %}
     </tbody>
   </table>
+{% else %}
+  <p>No fixtures to display</p>
+{% endif %}
 {% endblock %}

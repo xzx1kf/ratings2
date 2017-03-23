@@ -1,4 +1,4 @@
-from flask import render_template
+from flask import render_template, redirect
 from sqlalchemy import or_
 
 from app import app, db
@@ -7,8 +7,14 @@ from models import Fixture, Team, League
 
 @app.route('/')
 def index():
-    teams = db.session.query(Team).order_by(Team.name)
-    return render_template('index.html', teams=teams)
+    return redirect("leagues")
+
+
+@app.route('/leagues')
+def leagues():
+    leagues = League.query.filter(
+        League.active.is_(True)).order_by(League.name)
+    return render_template('leagues.html', leagues=leagues)
 
 
 @app.route('/<league_name>/fixtures')
@@ -29,7 +35,7 @@ def fixture(league_name, fixture_id):
         completed=True,
         home_team_id=fixture.home_team_id).order_by(Fixture.date.desc())[:5]
     home_all_fixtures = db.session.query(Fixture).filter(
-        Fixture.completed == True,
+        Fixture.completed.is_(True),
         (or_(
             Fixture.home_team_id == fixture.home_team_id,
             Fixture.away_team_id == fixture.home_team_id
@@ -38,7 +44,7 @@ def fixture(league_name, fixture_id):
         completed=True,
         away_team_id=fixture.away_team_id).order_by(Fixture.date.desc())[:5]
     away_all_fixtures = db.session.query(Fixture).filter(
-        Fixture.completed == True,
+        Fixture.completed.is_(True),
         (or_(
             Fixture.home_team_id == fixture.away_team_id,
             Fixture.away_team_id == fixture.away_team_id

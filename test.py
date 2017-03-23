@@ -1,13 +1,16 @@
 import os
 import unittest
 from datetime import datetime
-import requests
+
+from flask import url_for
 
 from config import basedir
 from app import app, db
 from models import League, Team, Fixture
+from utils import calculate
 
 from sqlalchemy.exc import IntegrityError
+from views import *
 
 
 class TestCase(unittest.TestCase):
@@ -26,13 +29,30 @@ class TestCase(unittest.TestCase):
         db.session.remove()
         db.drop_all()
 
-    def test_can_add_league(self):
-        db.session.add(self.league1)
+    def create_league(self, name="Test League 1"):
+        league = League(name=name, active=True)
+        db.session.add(league)
         db.session.commit()
+        return league, league.id
 
-        leagues = db.session.query(League).all()
-        self.assertTrue(len(leagues) == 1)
-        self.assertEqual(leagues[0].name, "Test League 1")
+    def test_league_view(self):
+        league, id = self.create_league()
+        resp = self.app.get('/leagues')
+
+        league = League.query.get(id)
+        self.assertEqual(resp.status_code, 200)
+        self.assertIn(league.name.encode('utf-8'), resp.data)
+
+    def test_no_leagues(self):
+        response = self.app.get('/leagues')
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b'No leagues to display.', response.data)
+        
+    def test_league_creation(self):
+        league, _ = self.create_league()
+
+        self.assertTrue(isinstance(league, League))
+        self.assertEqual(league.__unicode__(), league.name)
 
     def test_league_name_must_be_unique(self):
         db.session.add(self.league1)
@@ -53,7 +73,7 @@ class TestCase(unittest.TestCase):
             self.league2.slug = "Test League 1"
             db.session.commit()
 
-    def test_empty_db(self):
+    def test_navigate_to_league_fixtures(self):
         db.session.add(self.league1)
         db.session.commit()
         self.league1.slug = "testleague1"
@@ -73,18 +93,19 @@ class TestCase(unittest.TestCase):
         db.session.add(fixture)
         db.session.commit()
 
-        league = db.session.query(League).filter_by(
-            slug=self.league1.slug,
-            active=True).one()
-
-        fixtures = db.session.query(Fixture).filter_by(
-            completed=False,
-            league_id=league.id).order_by(Fixture.date)
+        # These functions need to run so that stats are generated
+        # for the league/teams.
+        # TODO: Might want to change this functionality.
+        calculate.league_tables()
+        calculate.league_stats()
+        calculate.team_stats(number_of_games=19)
+        calculate.fixture_stats()
 
         rv = self.app.get('/testleague1/fixtures')
-        print(rv.status_code)
-        self.assertEqual(rv.status_code, "200")
+        self.assertEqual(rv.status_code, 200)
 
+    def test_navigate_to_league_table(self):
+        pass
 
 if __name__ == '__main__':
     unittest.main()

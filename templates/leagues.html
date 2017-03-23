@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+{% if leagues.count() > 0 %}
+<ul>
+{% for league in leagues %}
+<li>
+  <a href="{{ url_for('fixtures', league_name=league.slug) }}">{{ league.display_name }}</a>
+</li>
+{% endfor %}
+</ul>
+{% else %}
+<p>No leagues to display.</p>
+{% endif %}
+{% endblock %}
